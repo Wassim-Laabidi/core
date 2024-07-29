@@ -75,6 +75,9 @@ RUN \
     && python3 -m compileall \
         homeassistant/homeassistant
 
+RUN pip3 install mysqlclient
+
+
 # Home Assistant S6-Overlay
 COPY rootfs /
 
