@@ -12,32 +12,60 @@ ENV \
 ARG QEMU_CPU
 
 # Install uv
+#RUN pip3 install uv==0.2.27
 RUN pip3 install uv==0.2.27
 
 WORKDIR /usr/src
+
+RUN apt-get update && \
+    apt-get install -y build-essential python3-dev 
 
 ## Setup Home Assistant Core dependencies
 COPY requirements.txt homeassistant/
 COPY homeassistant/package_constraints.txt homeassistant/homeassistant/
 RUN \
     uv pip install \
-        --no-build \
+        # --no-build \
         -r homeassistant/requirements.txt
 
+# COPY requirements_all.txt home_assistant_frontend-* home_assistant_intents-* homeassistant/
+# RUN \
+#     if ls homeassistant/home_assistant_*.whl 1> /dev/null 2>&1; then \
+#         uv pip install homeassistant/home_assistant_*.whl; \
+#     fi \
+#     && if [ "${BUILD_ARCH}" = "i386" ]; then \
+#         linux32 uv pip install \
+#             # --no-build \
+#             -r homeassistant/requirements_all.txt; \
+#     else \
+#         uv pip install \
+#             # --no-build \
+#             -r homeassistant/requirements_all.txt; \
+#     fi
+
 COPY requirements_all.txt home_assistant_frontend-* home_assistant_intents-* homeassistant/
-RUN \
-    if ls homeassistant/home_assistant_*.whl 1> /dev/null 2>&1; then \
-        uv pip install homeassistant/home_assistant_*.whl; \
-    fi \
-    && if [ "${BUILD_ARCH}" = "i386" ]; then \
-        linux32 uv pip install \
-            --no-build \
-            -r homeassistant/requirements_all.txt; \
-    else \
-        uv pip install \
-            --no-build \
-            -r homeassistant/requirements_all.txt; \
-    fi
+RUN uv pip install setuptools # Install setuptools first 
+
+# RUN \
+#     if ls homeassistant/home_assistant_*.whl 1> /dev/null 2>&1; then \
+#         uv pip install homeassistant/home_assistant_*.whl; \
+#     fi \
+#     && if [ "${BUILD_ARCH}" = "i386" ]; then \
+#         linux32 uv pip install \
+#             -r homeassistant/requirements_all.txt; \
+#     else \
+#         uv pip install \
+#             -r homeassistant/requirements_all.txt; \
+#     fi
+
+# RUN \
+#     if [ "${BUILD_ARCH}" = "i386" ]; then \
+#         linux32 uv pip install \
+#             -r homeassistant/requirements_all.txt; \
+#     else \
+#         uv pip install \
+#             -r homeassistant/requirements_all.txt; \
+#     fi
 
 ## Setup Home Assistant Core
 COPY . homeassistant/
@@ -51,3 +79,6 @@ RUN \
 COPY rootfs /
 
 WORKDIR /config
+# CMD ["/bin/bash"]
+
+CMD ["/usr/local/bin/python", "-m", "homeassistant", "--config", "/config"]
