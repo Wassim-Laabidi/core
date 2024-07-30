@@ -77,6 +77,9 @@ RUN \
 
 RUN pip3 install mysqlclient
 
+RUN sudo apt-get install libpcap-dev
+
+
 
 # Home Assistant S6-Overlay
 COPY rootfs /
