@@ -76,6 +76,7 @@ RUN \
         homeassistant/homeassistant
 
 RUN pip3 install mysqlclient
+RUN pip3 install numpy
 
 # Home Assistant S6-Overlay
 COPY rootfs /
