@@ -114,6 +114,7 @@ class DeviceInfo(TypedDict, total=False):
     translation_key: str | None
     translation_placeholders: Mapping[str, str] | None
     via_device: tuple[str, str]
+    owner: str | None
 
 
 DEVICE_INFO_TYPES = {
@@ -138,6 +139,7 @@ DEVICE_INFO_TYPES = {
         "suggested_area",
         "sw_version",
         "via_device",
+        "owner",
     },
     "secondary": {
         "connections",
@@ -734,6 +736,7 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
         translation_key: str | None = None,
         translation_placeholders: Mapping[str, str] | None = None,
         via_device: tuple[str, str] | None | UndefinedType = UNDEFINED,
+        owner: str | None | UndefinedType = UNDEFINED,
     ) -> DeviceEntry:
         """Get device. Create if it doesn't exist."""
         if configuration_url is not UNDEFINED:
@@ -779,6 +782,7 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
                 ("suggested_area", suggested_area),
                 ("sw_version", sw_version),
                 ("via_device", via_device),
+                ("owner", owner)
             )
             if val is not UNDEFINED
         }
@@ -817,6 +821,9 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
 
         if default_name is not UNDEFINED and device.name is None:
             name = default_name
+        
+        if owner is not UNDEFINED and device.owner is None:
+            device.owner = owner
 
         if via_device is not None and via_device is not UNDEFINED:
             via = self.async_get_device(identifiers={via_device})
@@ -855,6 +862,7 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
             suggested_area=suggested_area,
             sw_version=sw_version,
             via_device_id=via_device_id,
+            owner=owner
         )
 
         # This is safe because _async_update_device will always return a device
@@ -1212,7 +1220,7 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
                     serial_number=device["serial_number"],
                     sw_version=device["sw_version"],
                     via_device_id=device["via_device_id"],
-                    owner=device["owner"],
+                    owner=device["owner"]
                 )
             # Introduced in 0.111
             for device in data["deleted_devices"]:
