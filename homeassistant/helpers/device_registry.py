@@ -305,6 +305,7 @@ class DeviceEntry:
     via_device_id: str | None = attr.ib(default=None)
     # This value is not stored, just used to keep track of events to fire.
     is_new: bool = attr.ib(default=False)
+    owner: str | None = attr.ib(default=None)
 
     @property
     def disabled(self) -> bool:
@@ -339,6 +340,7 @@ class DeviceEntry:
             "serial_number": self.serial_number,
             "sw_version": self.sw_version,
             "via_device_id": self.via_device_id,
+            "owner": self.owner,
         }
 
     @cached_property
@@ -384,6 +386,7 @@ class DeviceEntry:
                     "serial_number": self.serial_number,
                     "sw_version": self.sw_version,
                     "via_device_id": self.via_device_id,
+                    "owner": self.owner,
                 }
             )
         )
@@ -482,6 +485,7 @@ class DeviceRegistryStore(storage.Store[dict[str, list[dict[str, Any]]]]):
                     except ValueError:
                         device["entry_type"] = None
                     device.setdefault("name_by_user", None)
+                    device.setdefault("owner", None)
                     # via_device_id was originally introduced as hub_device_id
                     device.setdefault("via_device_id", device.get("hub_device_id"))
                 old_data.setdefault("deleted_devices", [])
@@ -889,6 +893,7 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
         suggested_area: str | None | UndefinedType = UNDEFINED,
         sw_version: str | None | UndefinedType = UNDEFINED,
         via_device_id: str | None | UndefinedType = UNDEFINED,
+        owner: str | None | UndefinedType = UNDEFINED,
     ) -> DeviceEntry | None:
         """Update device attributes."""
         old = self.devices[device_id]
@@ -1048,6 +1053,7 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
             ("suggested_area", suggested_area),
             ("sw_version", sw_version),
             ("via_device_id", via_device_id),
+            ("owner", owner),
         ):
             if value is not UNDEFINED and value != getattr(old, attr_name):
                 new_values[attr_name] = value
@@ -1206,6 +1212,7 @@ class DeviceRegistry(BaseRegistry[dict[str, list[dict[str, Any]]]]):
                     serial_number=device["serial_number"],
                     sw_version=device["sw_version"],
                     via_device_id=device["via_device_id"],
+                    owner=device["owner"],
                 )
             # Introduced in 0.111
             for device in data["deleted_devices"]:
