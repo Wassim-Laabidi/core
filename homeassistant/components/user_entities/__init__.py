@@ -11,16 +11,28 @@ async def async_setup(hass: HomeAssistant, config: dict):
     
     @callback
     def handle_create_entity(call):
-        current_user = call.context.user_id  # Get the current user's ID
-        username = call.data[CONF_USERNAME]
+        # Dynamically find the relevant browser_user sensor
+        all_entities = hass.states.async_all()
+        current_user_id = None
+
+        for entity in all_entities:
+            if entity.entity_id.startswith('sensor.') and 'browser_user' in entity.entity_id:
+                user_data = entity.attributes.get('userData', {})
+                if user_data:
+                    current_user_id = user_data.get('id')
+                    break
         
-        if current_user != username:
-            return  # Do not create the entity if it belongs to a different user
-        
+        if not current_user_id:
+            return  # Exit if no valid user ID is found
+
+        # Create the entity with the current user's ID as the owner
         entity_name = call.data['entity_name']
-        entity = UserEntity(username, entity_name)
+        entity = UserEntity(username=current_user_id, name=entity_name)
         component.add_entities([entity])
 
+    # Register the service with Home Assistant
+    hass.services.async_register(DOMAIN, "create_entity", handle_create_entity)
+    return True
 
 class UserEntity(Entity):
     def __init__(self, username, name):
@@ -30,12 +42,22 @@ class UserEntity(Entity):
 
     @property
     def name(self):
+        return self._name
+
+    @property
+    def unique_id(self):
         return f"{self._username}_{self._name}"
 
+    @property
+    def device_state_attributes(self):
+        return {
+            "created_by": self._username
+        }
+    
     @property
     def state(self):
         return self._state
 
     async def async_update(self):
-        # Add logic for updating the entity state
+        # Logic for updating the entity's state
         pass
