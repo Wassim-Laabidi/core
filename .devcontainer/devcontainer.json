@@ -1,59 +1,49 @@
 {
-  "name": "Home Assistant Dev",
-  "context": "..",
-  "dockerFile": "../Dockerfile.dev",
-  "postCreateCommand": "script/setup",
+  "name": "Home Assistant Frontend",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "appPort": "8124:8123",
+  "postCreateCommand": "sudo apt update && sudo apt upgrade -y && sudo apt install -y libpcap-dev",
   "postStartCommand": "script/bootstrap",
   "containerEnv": {
-    "PYTHONASYNCIODEBUG": "1"
+    "DEV_CONTAINER": "1",
+    "WORKSPACE_DIRECTORY": "${containerWorkspaceFolder}"
   },
-  "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
-  },
-  // Port 5683 udp is used by Shelly integration
-  "appPort": ["8123:8123", "5683:5683/udp"],
-  "runArgs": ["-e", "GIT_EDITOR=code --wait"],
+  "mounts": [
+    "source=../../frontend/,target=/workspaces/frontend,type=bind,consistency=cached"
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
-        "charliermarsh.ruff",
-        "ms-python.pylint",
-        "ms-python.vscode-pylance",
-        "visualstudioexptteam.vscodeintellicode",
-        "redhat.vscode-yaml",
+        "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "GitHub.vscode-pull-request-github",
-        "GitHub.copilot"
+        "runem.lit-plugin",
+        "github.vscode-pull-request-github",
+        "eamodio.gitlens"
       ],
-      // Please keep this file in sync with settings in home-assistant/.vscode/settings.default.json
       "settings": {
-        "python.experiments.optOutFrom": ["pythonTestAdapter"],
-        "python.defaultInterpreterPath": "/home/vscode/.local/ha-venv/bin/python",
-        "python.pythonPath": "/home/vscode/.local/ha-venv/bin/python",
-        "python.terminal.activateEnvInCurrentTerminal": true,
-        "python.testing.pytestArgs": ["--no-cov"],
-        "pylint.importStrategy": "fromEnvironment",
+        "files.eol": "\n",
+        "editor.tabSize": 2,
         "editor.formatOnPaste": false,
         "editor.formatOnSave": true,
         "editor.formatOnType": true,
-        "files.trimTrailingWhitespace": true,
-        "terminal.integrated.profiles.linux": {
-          "zsh": {
-            "path": "/usr/bin/zsh"
-          }
-        },
-        "terminal.integrated.defaultProfile.linux": "zsh",
-        "yaml.customTags": [
-          "!input scalar",
-          "!secret scalar",
-          "!include_dir_named scalar",
-          "!include_dir_list scalar",
-          "!include_dir_merge_list scalar",
-          "!include_dir_merge_named scalar"
+        "editor.renderWhitespace": "boundary",
+        "editor.rulers": [
+          80
         ],
-        "[python]": {
-          "editor.defaultFormatter": "charliermarsh.ruff"
-        }
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "files.trimTrailingWhitespace": true,
+        "terminal.integrated.shell.linux": "/usr/bin/zsh",
+        "gitlens.showWelcomeOnInstall": false,
+        "gitlens.showWhatsNewAfterUpgrades": false,
+        "workbench.startupEditor": "none"
       }
     }
   }
