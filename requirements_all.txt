@@ -122,7 +122,8 @@ SQLAlchemy==2.0.31
 Tami4EdgeAPI==3.0
 
 # homeassistant.components.travisci
-TravisPy>=0.4.0
+# TravisPy>=0.4.0
+TravisPy
 
 # homeassistant.components.twitter
 TwitterAPI==2.7.12
@@ -1171,8 +1172,8 @@ iottycloud==0.1.3
 
 # homeassistant.components.iperf3
 # iperf3==0.1.11
-iperf3>=0.1.12
-
+# iperf3>=0.1.12
+iperf3
 # homeassistant.components.isal
 isal==1.6.1
 
