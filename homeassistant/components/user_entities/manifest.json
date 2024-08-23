@@ -1,8 +1,0 @@
-{
-  "domain": "user_entities",
-  "name": "User-Specific Entities",
-  "documentation": "https://pyxis.com.tn/",
-  "dependencies": [],
-  "codeowners": ["@pyxisIT"],
-  "requirements": []
-}
